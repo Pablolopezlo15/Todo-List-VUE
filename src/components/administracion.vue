@@ -102,19 +102,20 @@ const listaFiltrada = ref();
 let listaOriginal = ref(useCollection(query(coleccion, where("idUsuario", "==", uid), orderBy("prioridad", "desc"))));
 
 function buscarNota() {
-  console.log(buscar.value);
-
-  if (buscar.value != "") {
+  console.log(buscar);
+  console.log(buscar.length);
+  if (buscar.length >= 1) {
     busqueda = true;
     if (list.value != undefined){
       list.value = list.value.filter((todo) => todo.texto.includes(buscar));
     }
   } else {
-    list.value = listaOriginal;
+    list.value = listaOriginal.value;
     busqueda = false;
     
   }
 }
+
 
 
 </script>
