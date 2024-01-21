@@ -39,6 +39,7 @@ function altaNota(contenidoNota, downloadURL, uid) {
     console.log(downloadURL)
     const docRef = addDoc(collection(db, "todos"), {
         idUsuario: uid,
+        correo: auth.currentUser.email,
         texto: contenidoNota,
         URL: downloadURL,
         prioridad: "0",
@@ -150,7 +151,33 @@ function buscarNota() {
   }
 }
 
+function prioridad(prioridad){
+  if (prioridad == 0) {
+    return "Baja";
+  } else if (prioridad == 1) {
+    return "Media";
+  } else {
+    return "Alta";
+  }
+}
 
+function tareasPendientes() {
+  let tareasPendientes = 0;
+  list.value.forEach((todo) => {
+    if (todo.completada == false) {
+      tareasPendientes++;
+    }
+  });
+  return tareasPendientes;
+}
+
+function totalTareas() {
+  let totalTareas = 0;
+  list.value.forEach((todo) => {
+    totalTareas++;
+  });
+  return totalTareas;
+}
 
 </script>
 
@@ -164,15 +191,15 @@ function buscarNota() {
     <input type="text" v-model="buscar" @keyup="buscarNota" placeholder="Buscar...">
   </nav>
   <ul>
-    <div>   
+    <div class="encabezado">   
         <p>Resultados de la búsqueda: {{ buscar }}</p>
-        <!-- <p>Tareas pendientes: {{ tareasPendientes }} / {{ totalTareas }}</p> -->
+        <p>Tareas pendientes: {{ tareasPendientes() }} / {{ totalTareas() }}</p>
         <button @click="borrarCompletadas">Borrar Completadas</button>
     </div>
     
     <li v-for="todo in list" :key="todo.id">
       <h4> {{ todo.texto }} </h4>
-      <p>{{ todo.prioridad }} Creada hace: {{ tiempoDesdeCreacion(todo.fecha) }}</p>
+      <p>Prioridad: {{ prioridad(todo.prioridad) }} || Creada hace: {{ tiempoDesdeCreacion(todo.fecha) }}</p>
       <button @click="eliminarNota(todo.id)">Eliminar</button>
       <button @click="establecerPrioridadAlta(todo.id)">Alta ^</button>
       <button @click="establecerPrioridadMedia(todo.id)">Media -</button>

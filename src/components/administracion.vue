@@ -76,10 +76,15 @@ function establecerPrioridadMedia(id) {
 
 function establecerPrioridadAlta(id) {
   const docRef = doc(db, "todos", id);
+
   updateDoc(docRef, {
     prioridad: "2",
   });
   console.log("Prioridad alta con id" + id);
+}
+
+function actual() {
+
 }
 
 function tiempoDesdeCreacion(timestamp) {
@@ -89,9 +94,18 @@ function tiempoDesdeCreacion(timestamp) {
 
     const minutos = Math.floor(diferencia / 60000); 
 
-    return minutos;
-}
+    if (minutos < 60) {
+        return minutos + ' min';
+    } else if (minutos < 1440) {
+        const horas = Math.floor(minutos / 60);
+        return horas + ' h';
+    }
+    else {
+        const dias = Math.floor(minutos / 1440);
+        return dias + ' d';
+    }
 
+}
 function verArchivo(url) {
   window.open(url);
 }
@@ -116,6 +130,33 @@ function buscarNota() {
   }
 }
 
+function prioridad(prioridad){
+  if (prioridad == 0) {
+    return "Baja";
+  } else if (prioridad == 1) {
+    return "Media";
+  } else {
+    return "Alta";
+  }
+}
+
+function tareasPendientes() {
+  let tareasPendientes = 0;
+  list.value.forEach((todo) => {
+    if (todo.completada == false) {
+      tareasPendientes++;
+    }
+  });
+  return tareasPendientes;
+}
+
+function totalTareas() {
+  let totalTareas = 0;
+  list.value.forEach((todo) => {
+    totalTareas++;
+  });
+  return totalTareas;
+}
 
 
 </script>
@@ -126,9 +167,9 @@ function buscarNota() {
     <h1>Menu Administración</h1>
 </main>
   <ul>
-    <div>   
-        <p v-if="busqueda">Resultados de la búsqueda: {{ buscar }}</p>
-        <!-- <p>Tareas pendientes: {{ tareasPendientes }} / {{ totalTareas }}</p> -->
+    <div class="encabezado">   
+      <p>Resultados de la búsqueda: {{ buscar }}</p>
+        <p>Tareas pendientes: {{ tareasPendientes() }} / {{ totalTareas() }}</p>
         <button @click="borrarCompletadas">Borrar Completadas</button>
         <button @click="borrarTodas">Borrar TODO</button>
         <input type="text" v-model="buscar" @keyup="buscarNota" placeholder="Buscar...">
@@ -136,7 +177,9 @@ function buscarNota() {
     
     <li v-for="todo in list" ref="listaFiltrada">
       <h4> {{ todo.texto }} </h4>
-      <!-- <p>Creado por: {{ user }}</p> -->
+      <p>Prioridad: {{ prioridad(todo.prioridad) }} || Creada hace: {{ tiempoDesdeCreacion(todo.fecha) }}</p>
+
+      <p>Creado por: {{ todo.correo }}</p>
       <button @click="eliminarNota(todo.id)">Eliminar</button>
       <button @click="establecerPrioridadAlta(todo.id)">Alta ^</button>
       <button @click="establecerPrioridadMedia(todo.id)">Media -</button>
@@ -146,3 +189,10 @@ function buscarNota() {
     </li>
   </ul>
 </template>
+
+<style scoped>
+.active {
+  background-color: blue;
+  color: white;
+}
+</style>
