@@ -7,6 +7,7 @@ import { query, where, orderBy } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import cabecera from './cabecera.vue'
 import { computed } from "vue";
+import { onMounted } from "vue";
 
 
 let db = useFirestore();
@@ -17,6 +18,7 @@ let uid = auth.currentUser.uid;
 
 const coleccion = collection(db, "todos");
 let list = ref(useCollection(query(coleccion, where("idUsuario", "==", uid), orderBy("prioridad", "desc"))));
+console.log(list.value);
 
 async function subirAdjunto(event) {
     console.log("subirAdjunto");
@@ -129,20 +131,25 @@ function verArchivo(url) {
 }
 
 let buscar = ref("");
-let busqueda = ref(false);
+let busqueda = false;
+const listaFiltrada = ref();
+let listaOriginal = ref(useCollection(query(coleccion, where("idUsuario", "==", uid), orderBy("prioridad", "desc"))));
 
 function buscarNota() {
+  console.log(buscar.value);
+
   if (buscar.value != "") {
     busqueda = true;
+    if (list.value != undefined){
+      list.value = list.value.filter((todo) => todo.texto.includes(buscar));
+    }
   } else {
+    list.value = listaOriginal;
     busqueda = false;
+    
   }
 }
 
-const listaFiltrada = computed(() => {
-
-  return list.value.filter((todo) => todo.texto.includes(buscar));
-});
 
 
 </script>
@@ -158,12 +165,12 @@ const listaFiltrada = computed(() => {
   </nav>
   <ul>
     <div>   
-        <p v-if="busqueda">Resultados de la búsqueda: {{ buscar }}</p>
+        <p>Resultados de la búsqueda: {{ buscar }}</p>
         <!-- <p>Tareas pendientes: {{ tareasPendientes }} / {{ totalTareas }}</p> -->
         <button @click="borrarCompletadas">Borrar Completadas</button>
     </div>
     
-    <li v-for="todo in listaFiltrada">
+    <li v-for="todo in list" :key="todo.id">
       <h4> {{ todo.texto }} </h4>
       <p>{{ todo.prioridad }} Creada hace: {{ tiempoDesdeCreacion(todo.fecha) }}</p>
       <button @click="eliminarNota(todo.id)">Eliminar</button>

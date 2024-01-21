@@ -97,21 +97,24 @@ function verArchivo(url) {
 }
 
 let buscar = ref("");
-let busqueda = ref(false);
+let busqueda = false;
+const listaFiltrada = ref();
+let listaOriginal = ref(useCollection(query(coleccion, where("idUsuario", "==", uid), orderBy("prioridad", "desc"))));
 
 function buscarNota() {
+  console.log(buscar.value);
+
   if (buscar.value != "") {
     busqueda = true;
+    if (list.value != undefined){
+      list.value = list.value.filter((todo) => todo.texto.includes(buscar));
+    }
   } else {
+    list.value = listaOriginal;
     busqueda = false;
+    
   }
 }
-
-const listaFiltrada = computed(() => {
-
-  return list.value.filter((todo) => todo.texto.includes(buscar));
-});
-
 
 
 </script>
@@ -130,7 +133,7 @@ const listaFiltrada = computed(() => {
         <input type="text" v-model="buscar" @keyup="buscarNota" placeholder="Buscar...">
     </div>
     
-    <li v-for="todo in list">
+    <li v-for="todo in list" ref="listaFiltrada">
       <h4> {{ todo.texto }} </h4>
       <!-- <p>Creado por: {{ user }}</p> -->
       <button @click="eliminarNota(todo.id)">Eliminar</button>

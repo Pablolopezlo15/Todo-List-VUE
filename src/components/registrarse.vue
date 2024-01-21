@@ -76,6 +76,10 @@ function iniciarSesion() {
     const email = error.customData.email;
     // The AuthCredential type that was used.
     const credential = GoogleAuthProvider.credentialFromError(error);
+
+    if (errorCode == 'auth/account-exists-with-different-credential') {
+      errorPorCorreoExisitente.value = 'Ya existe un usuario con la misma dirección de correo electrónico pero con diferentes credenciales de inicio de sesión.';
+    }
     // ...
   });
 }
@@ -102,9 +106,9 @@ function iniciarConGithub() {
     // The AuthCredential type that was used.
     const credential = GithubAuthProvider.credentialFromError(error);
 	console.log(errorCode);
-	if (errorCode === 'auth/account-exists-with-different-credential') {
-		errorPorCorreoExisitente = 'Ya existe un usuario con la misma dirección de correo electrónico pero con diferentes credenciales de inicio de sesión.';
-	}
+  if (errorCode == 'auth/account-exists-with-different-credential') {
+      errorPorCorreoExisitente.value = 'Ya existe un usuario con la misma dirección de correo electrónico pero con diferentes credenciales de inicio de sesión.';
+  }
     // ...
   });
 }
@@ -130,15 +134,13 @@ function iniciarConFaceBook() {
     const email = error.customData.email;
     // The AuthCredential type that was used.
     const credential = FacebookAuthProvider.credentialFromError(error);
-
+    if (errorCode == 'auth/account-exists-with-different-credential') {
+      errorPorCorreoExisitente.value = 'Ya existe un usuario con la misma dirección de correo electrónico pero con diferentes credenciales de inicio de sesión.';
+  }
     // ...
   });
 
 }
-
-nextTick(() => {
-  errorPorCorreoExisitente = null;
-});
 
 
 </script>
